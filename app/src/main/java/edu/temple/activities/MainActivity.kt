@@ -1,5 +1,6 @@
 package edu.temple.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -17,15 +18,16 @@ class MainActivity : AppCompatActivity() {
         // Create array of integers that are multiples of 5
         // Verify correctness by examining array values.
         val textSizes = Array(20){(it + 1) * 5}
-
+        val launchIntent = Intent(this,DisplayActivity::class.java)
         Log.d("Array values", textSizes.contentToString())
-
         with (findViewById(R.id.textSizeSelectorRecyclerView) as RecyclerView) {
 
             // TODO Step2: Implement lambda body to launch new activity and pass value
-            adapter = TextSizeAdapter(textSizes){
-
+            val callback ={fontSize:Int ->
+                launchIntent.putExtra("Textsize",fontSize.toFloat())
+                startActivity(launchIntent)
             }
+            adapter = TextSizeAdapter(textSizes, callback)
             layoutManager = LinearLayoutManager(this@MainActivity)
         }
 
@@ -39,9 +41,12 @@ class MainActivity : AppCompatActivity() {
 class TextSizeAdapter (private val textSizes: Array<Int>, callback: (Int)->Unit) : RecyclerView.Adapter<TextSizeAdapter.TextSizeViewHolder>() {
 
     // TODO Step 1: Complete onClickListener to return selected number
+    val _callback = callback
     inner class TextSizeViewHolder(val textView: TextView) : RecyclerView.ViewHolder (textView) {
         init {
-            textView.setOnClickListener {  }
+            textView.setOnClickListener {
+                _callback(textSizes[adapterPosition])
+            }
         }
     }
 
